@@ -28,6 +28,8 @@
                      
   a[8] = {1,2,3,4,5,6,7,8}  
   
+  O(N^2)
+  N swaps
   */
 int compare_func(int *a,  int *b)
 {
