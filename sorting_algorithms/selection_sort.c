@@ -31,7 +31,7 @@
   O(N^2)
   N swaps
   */
-int compare_func(int *a,  int *b)
+int compLT_func(int *a,  int *b)
 {
 	if(*a < *b)
       return 1;
@@ -52,8 +52,9 @@ void selection_sort(int *arr, int size)
 	for(i=0; i<size; i++)
 	{
 		int min = i;
+		//find minimum element in the remaining elements
 		for(j=i+1; j<size; j++)
-		  if(compare_func(&arr[j], &arr[min]))
+		  if(compLT_func(&arr[j], &arr[min]))
 			  min = j;
 		swap(&arr[i], &arr[min]);
 	}
