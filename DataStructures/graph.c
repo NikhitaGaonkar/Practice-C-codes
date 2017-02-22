@@ -3,8 +3,10 @@
 #include<string.h>
 #include<stdbool.h>
 #include"stack.c"
+#include "queue_linkedList.c"
 
 /*
+    GRAPH API
 	Undireced grap representation - Adjacency List
 
     0----1
@@ -110,12 +112,16 @@ void print_graph(Graph *g)
 	}
 }
 
+
+//////////////////////////////////////////SEARCH ALGORITHMS////////////////////////
 typedef struct search_info{
 	
 	int *edgeTo;
 	bool *visited;
 }search_info;
 
+
+////////////////////////////////////DFS/////////////////////////////////////
 void dfs(Graph *g, search_info *s, int v)
 {
 	if(s== NULL)
@@ -134,6 +140,67 @@ void dfs(Graph *g, search_info *s, int v)
 	}
 }
 
+//find path from v to w
+void DepthFirstPaths(Graph *g, int V, int v)
+{
+	search_info *s = malloc(sizeof(search_info));
+	s->edgeTo = malloc(sizeof(int) * V);
+	s->visited = malloc(sizeof(bool) * V);
+	dfs(g, s, v);
+	int i;
+	
+	for(i=0; i<V; i++)
+      printf("%d ", s->edgeTo[i]);
+	//pathTo(s, g, v);
+}
+//////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////BFS/////////////////////////////////////////
+void bfs(Graph *g, search_info *s, int src)
+{
+	Queue *q = create_queue(g->V);
+	enqueue(q,src);
+	s->visited[src] = true;
+	while(q->front != NULL)
+	{
+		int v = dequeue(q);
+		
+		adj_list_node *adj_node = g->array[src].head;
+		while(adj_node != NULL)
+		{
+		  int adj_V = adj_node->dest;	
+		  printf("adj_V : %d\n",adj_V);
+		  if(s->visited[adj_V] == false)
+		  {
+		  	printf("i am here \n");
+			  enqueue(q, adj_V);
+			  s->visited[adj_V] = true;
+			  s->edgeTo[adj_V] = v; //add the source node
+		  }
+		  adj_node = adj_node->next;
+		}	
+		 
+	}
+	printf("hello world \n");
+	
+}
+
+void BreadthFirstPath(Graph *g, int src)
+{
+  search_info *s = malloc(sizeof(search_info));	
+  s->edgeTo = malloc(sizeof(int)* g->V);
+  s->visited = malloc(sizeof(search_info) * g->V);
+  bfs(g, s, src);
+  int i =0;
+  
+  for(i=0; i< 5; i++)
+    printf("%d", s->edgeTo[i]);
+}
+/////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////PATH TO ////////////////////////////////////////
 void print_path(Stack *S)
 {
 	while(S->size != 0)
@@ -163,19 +230,8 @@ void pathTo(search_info *s, Graph *g, int v)
 	
 	//print_path(S);
 }
+/////////////////////////////////////////////////////////////////////////////
 
-//find path from v to w
-void DepthFirstPaths(Graph *g, int V, int v)
-{
-	search_info *s = malloc(sizeof(search_info));
-	s->edgeTo = malloc(sizeof(int) * V);
-	s->visited = malloc(sizeof(bool) * V);
-	dfs(g, s, v);
-	int i;
-	for(i=0; i<V; i++)
-      printf("%d ", s->edgeTo[i]);
-	//pathTo(s, g, v);
-}
 
 int main(void)
 {
@@ -194,7 +250,10 @@ int main(void)
 	printf("\n");
 	printf("dfs \n");
 	//find path from 0 to w ie 3
-	DepthFirstPaths(graph, V, 0);
+//	DepthFirstPaths(graph, V, 0);
+	
+	printf("\n\n");
+	BreadthFirstPath(graph, 0);
 	
 	return 0;
 }
