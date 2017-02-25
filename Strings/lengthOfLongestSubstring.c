@@ -1,3 +1,28 @@
+int lengthOfLongestSubstring(char* str) {
+    int map[256];
+    for(int k=0; k<256; k++)
+      map[k] = -1;
+      
+    int len = strlen(str);
+    int len_so_far = 0, max_len =0, start=0;
+    
+    for(int i=0; i<len; i++)
+    {
+       //set start to position one higher than the previous position of repeating
+	   //character only if it is not part od the current substring under consideration 
+       if(map[str[i]] != -1 && start <= map[str[i]])
+         start = map[str[i]] +1;
+        
+       map[str[i]] = i;
+       len_so_far = i-start+1;
+       if(len_so_far>max_len)
+         max_len = len_so_far;
+    }
+    return max_len;
+}
+
+
+#if 0
 int lengthOfLongestSubstring(char* s) {
    
    int len = strlen(s);
@@ -46,3 +71,5 @@ int lengthOfLongestSubstring(char* s) {
    free(visited);
    return max_len;
 }
+#edif
+
