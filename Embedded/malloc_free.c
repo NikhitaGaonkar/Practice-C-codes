@@ -171,11 +171,61 @@ void *realloc(void *ptr, size_t size)
 	return new_ptr;
 }
 
+/*
+Alligned malloc
+You need an offset if you want to support alignments beyond what your system's malloc() does. 
+For example if your system malloc() aligns to 8 byte boundaries, and you want to align to 16 bytes, 
+you ask for 15 bytes extra so you know for sure you can shift the result around to align it as requested. 
+
+You also add sizeof(void*) to the size you pass to malloc() to leave room for bookkeeping.
+~(alignment - 1) is what guarantees the alignment. For example if alignment is 16, then subtract 1 to get 15, aka 0xF, 
+then negating it makes 0xFF..FF0 which is the mask you need to satisfy the alignment for any returned pointer from malloc(). 
+Note that this trick assumes alignment is a power of 2 (which practically it normally would be, but there really should be a check).
+
+It's a void**. The function returns void*. This is OK because a pointer to void is "A pointer to any type," and in this case that type is void*. 
+In other words, converting void* to and from other pointer types is allowed, and a double-pointer is still a pointer.
+
+The overall scheme here is to store the original pointer before the one that's returned to the caller.
+Some implementations of standard malloc() do the same thing: stash bookkeeping information before the returned block. 
+This makes it easy to know how much space to reclaim when free() is called.
+
+All that said, this sort of thing is usually not useful, because the standard malloc() returns the largest alignment on the system. 
+If you need alignment beyond that, there may be other solutions, including compiler-specific attributes.
+
+
+Quantity    			Address Divisible by 	Binary address ends in 
+ Byte 							1						anything
+ Half word(16 bits)				2						0
+ Word(32 bits)					4						00
+ Doubleword (64 bits)			8						000
+ and so on....
+ for 16 its will be 0000
+ 
+ 
+ The size_t type is the unsigned integer type that is the result of the sizeof operator (and the offsetof operator),
+ so it is guaranteed to be big enough to contain the size of the biggest object your system can handle (e.g., a static array of 8Gb).
+
+The size_t type may be bigger than, equal to, or smaller than an unsigned int, and your compiler might make assumptions about it for optimization.
+*/
 
 
 
+void * alligned_amlloc(size_t required_bytes, size_t alignment)
+{
+	void* p1 NULL;    //original block
+	void **p2 = NULL; //aligned block
+	int offset = alignment-1 + sizeof(void*);
+	p1 = (void*)malloc(required_bytes + offset);
+	if(p1 == NULL) return NULL;
+	p2 = (void**)(((size_t)p1 + offset) & (~(alignment -1)));
+	p2[-1] = p1; //store address of p1 for free()
+	return p2; //returning address of p2
+}
 
-
+void free(void *p)
+{
+	free((void**)p[-1]); //pass the address of p1
+}
 
 
 
