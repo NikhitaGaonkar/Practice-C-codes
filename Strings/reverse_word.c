@@ -1,3 +1,10 @@
+/*
+the sky is blue 
+
+blue is sky the
+
+*/
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
